@@ -70,6 +70,8 @@ st.markdown("""
     }
 
     .glass-card:hover {
+        transform: rotateX(2deg) rotateY(-2deg) scale(1.01);
+        animation-play-state: paused;
         box-shadow:
             0 35px 60px rgba(0,0,0,0.5),
             0 10px 30px rgba(0, 245, 212, 0.25),
@@ -168,48 +170,6 @@ st.markdown("""
     hr { border-color: rgba(255,255,255,0.1) !important; }
 </style>
 """, unsafe_allow_html=True)
-
-# ---------------------------
-# Mouse-follow 3D Tilt Effect (JS injected into parent page)
-# ---------------------------
-import streamlit.components.v1 as components
-
-components.html("""
-<script>
-const doc = window.parent.document;
-
-function applyTilt() {
-    const card = doc.querySelector('.glass-card');
-    if (!card) return;
-
-    card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = ((y - centerY) / centerY) * -6;
-        const rotateY = ((x - centerX) / centerX) * 6;
-        card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.01)`;
-        card.style.animation = 'none';
-    });
-
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = 'rotateX(0deg) rotateY(0deg) scale(1)';
-        card.style.animation = 'floatCard 5s ease-in-out infinite';
-    });
-}
-
-// Retry until the card exists (Streamlit renders async)
-const interval = setInterval(() => {
-    const card = doc.querySelector('.glass-card');
-    if (card && !card.dataset.tiltApplied) {
-        card.dataset.tiltApplied = "true";
-        applyTilt();
-    }
-}, 500);
-</script>
-""", height=0)
 
 # ---------------------------
 # Load Model (cached so it loads only once)
